@@ -4,14 +4,38 @@ from datetime import date
 
 # Create your models here.
 class Employee(AbstractUser):
-    full_name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    employee_id = models.CharField(max_length=20, unique=True, blank=True)
-    dob = models.DateField(null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
-    gender = models.CharField(max_length=10, null=True, blank=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
-    position = models.CharField(max_length=100, null=True, blank=True)
+    GENDER_CHOICES=(
+        ('male', 'MALE'),
+        ('female', 'FEMALE'),
+        )
+    POSITION_CHOICES=(
+        ('manager', 'MANAGER'),
+        ('developer', 'DEVELOPER'),
+        ('designer', 'DESIGNER'),
+        ('tester', 'TESTER'),
+        ('hr', 'HR'),
+        ('intern', 'INTERN'),
+        ('software engineer', 'SOFTWARE ENGINEER'),
+        ('data scientist', 'DATA SCIENTIST'),
+        ('product manager', 'PRODUCT MANAGER'),
+        ('business analyst', 'BUSINESS ANALYST'),
+        ('devops engineer', 'DEVOPS ENGINEER'),
+        ('system administrator', 'SYSTEM ADMINISTRATOR'),
+        ('network engineer', 'NETWORK ENGINEER'),
+        ('technical support', 'TECHNICAL SUPPORT'),
+        ('it consultant', 'IT CONSULTANT'),
+        ('other', 'OTHER'),
+    )
+    full_name = models.CharField(max_length=200, null=True)
+    email = models.EmailField(unique=True, null=True)
+    Gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    Position = models.CharField(max_length=200, null=True, choices=POSITION_CHOICES)
+    Date_of_Birth = models.DateField(null=True)
+    Employment_date = models.DateField(default=date.today)
+    phone_number = models.CharField(max_length=15, null=True)
+    address = models.TextField(null=True)
+    employee_id = models.CharField(max_length=20, unique=True, null=True)
+    department = models.CharField(max_length=100, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -33,8 +57,6 @@ class Employee(AbstractUser):
 
     def __str__(self):
         return f"{self.full_name} ({self.employee_id})"
-
-# Creates a model for employees extending the default Django User model with additional fields.
 
 class Attendance(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendances')
