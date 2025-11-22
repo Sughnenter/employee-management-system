@@ -28,12 +28,12 @@ class Employee(AbstractUser):
     )
     full_name = models.CharField(max_length=200, null=True)
     email = models.EmailField(unique=True, null=True)
-    Gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    Position = models.CharField(max_length=200, null=True, choices=POSITION_CHOICES)
-    Date_of_Birth = models.DateField(null=True)
-    Employment_date = models.DateField(default=date.today)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    position = models.CharField(max_length=200, null=True, choices=POSITION_CHOICES)
+    date_of_birth = models.DateField(null=True)
+    employment_date = models.DateField(default=date.today)
     phone_number = models.CharField(max_length=15, null=True)
-    address = models.TextField(null=True)
+    address = models.CharField(max_length=200, null=True)
     employee_id = models.CharField(max_length=20, unique=True, null=True)
     department = models.CharField(max_length=100, null=True)
 
@@ -84,14 +84,10 @@ class Task(models.Model):
     description = models.TextField() #description of task field
     assigned_date = models.DateField(auto_now_add=True) #date field for assigned date
     deadline = models.DateField() #date field for deadline
-    status = models.CharField(
-        max_length=20,
-        choices=[('Pending', 'Pending'), ('Completed', 'Completed')],
-        default='Pending'
-    )
+    complete = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ['status', 'deadline']
+    class Meta():
+        ordering = ['complete']
 
 
     def __str__(self):

@@ -1,0 +1,84 @@
+{% extends 'employee/base.html' %} {% block content %}
+<div class="p-6">
+  <!-- Header -->
+  <div class="bg-gray-800 text-white p-6 rounded-xl shadow mb-8">
+    <h1 class="text-3xl font-semibold">Welcome, {{ employee.full_name }}</h1>
+    <p class="text-gray-300 mt-2">Here are your assigned tasks:</p>
+  </div>
+  <!-- Logout Button -->
+  <a
+    href="{% url 'logout' %}"
+    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+  >
+    Logout
+  </a>
+
+  <!-- Tasks Section -->
+  <div class="grid gap-4">
+    {% for task in tasks %}
+    <div
+      class="bg-gray-900 border border-gray-700 p-5 rounded-xl shadow flex justify-between items-center"
+    >
+      <div>
+        <h2 class="text-xl font-semibold text-white">{{ task.title }}</h2>
+        <p class="text-gray-400 text-sm mt-1">{{ task.description }}</p>
+        <p class="text-gray-500 text-sm mt-2">Deadline: {{ task.deadline }}</p>
+        <p class="text-gray-400 mt-2">
+          Status:
+          <span
+            class="{% if task.status == 'Completed' %}text-green-400{% else %}text-yellow-400{% endif %}"
+          >
+            {{ task.status }}
+          </span>
+        </p>
+      </div>
+
+      {% if task.status != "Completed" %}
+      <button
+        onclick="completeTask({{ task.id }})"
+        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+      >
+        Mark Completed
+      </button>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-gray-400 text-center">No tasks assigned.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function completeTask(taskId) {
+    fetch(`/task/${taskId}/complete/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          location.reload();
+        }
+      });
+  }
+
+  // CSRF helper
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = cookie.substring(name.length + 1);
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+
+{% endblock %}
