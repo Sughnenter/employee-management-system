@@ -1,38 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}EMS{% endblock %}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}EMS{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
 
-<body class="bg-gray-100 text-gray-800">
-  <!-- NAVBAR (optional) -->
-  <header class="bg-white shadow p-4">
-    <h1 class="text-xl font-semibold">Employee Management System</h1>
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit" style="
-            padding: 8px 14px;
-            background: #c0392b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        ">
-            Logout
-        </button>
-  </header>
+  <body class="bg-gray-100 text-gray-800">
+    <!-- NAVBAR (optional) -->
+    <header class="bg-white shadow p-4">
+      <h1 class="text-xl font-semibold">Employee Management System</h1>
+      {# Show the Logout link only when the current view is not `login` or
+      `register` #}
+      <nav class="mt-2">
+        {% if request.user.is_authenticated and request.resolver_match.url_name
+        != 'login' and request.resolver_match.url_name != 'register' %}
+        <a href="{% url 'logout' %}" class="text-red-600 hover:underline"
+          >Logout</a
+        >
+        <a
+          href="{% url 'dashboard' %}"
+          class="mr-4 text-blue-600 hover:underline"
+          >Dashboard</a
+        >
+        {% endif %}
+      </nav>
+    </header>
 
-  <!-- MAIN -->
-  <main class="p-6">
-    {% block content %}{% endblock %}
-  </main>
+    <!-- MAIN -->
+    <main class="p-6">{% block content %}{% endblock %}</main>
 
-  <!-- FOOTER (optional) -->
-  <footer class="p-4 text-center text-sm text-gray-500">
-    © 2025 EMS
-  </footer>
-</body>
+    <!-- FOOTER (optional) -->
+    <footer class="p-4 text-center text-sm text-gray-500">© 2025 EMS</footer>
+  </body>
 </html>

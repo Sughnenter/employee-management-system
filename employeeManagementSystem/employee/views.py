@@ -70,3 +70,16 @@ class TaskCreate(LoginRequiredMixin, CreateView):
         # The Task model has an `employee` ForeignKey — set that to the logged-in user
         form.instance.employee = self.request.user
         return super(TaskCreate, self).form_valid(form)
+
+class TaskUpdate(LoginRequiredMixin, UpdateView):
+    model = Task
+    fields = ['title', 'description', 'deadline', 'complete']
+    success_url = reverse_lazy('tasks')
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(TaskUpdate, self).form_valid(form)
+
+class TaskDelete(LoginRequiredMixin, DeleteView):
+    model = Task
+    context_object_name = 'task'
+    success_url = reverse_lazy('tasks')
