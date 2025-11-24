@@ -50,6 +50,11 @@ class RegisterEmployeeView(FormView):
 class DashboardView(LoginRequiredMixin, ListView):
     model = Task
     template_name = 'employee/dashboard.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        # Only show tasks assigned to the logged-in employee
+        return Task.objects.filter(employee=self.request.user).order_by('-deadline')
 
 @require_POST
 @login_required
@@ -76,7 +81,8 @@ class TaskUpdate(LoginRequiredMixin, UpdateView):
     fields = ['title', 'description', 'deadline', 'complete']
     success_url = reverse_lazy('tasks')
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        # The Task model has an `employee` ForeignKey — set that to the logged-in user
+        form.instance.employee = self.request.user
         return super(TaskUpdate, self).form_valid(form)
 
 class TaskDelete(LoginRequiredMixin, DeleteView):

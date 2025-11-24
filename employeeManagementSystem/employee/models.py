@@ -26,6 +26,7 @@ class Employee(AbstractUser):
         ('it consultant', 'IT CONSULTANT'),
         ('other', 'OTHER'),
     )
+    
     full_name = models.CharField(max_length=200, null=True)
     email = models.EmailField(unique=True, null=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
