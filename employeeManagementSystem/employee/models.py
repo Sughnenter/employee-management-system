@@ -80,12 +80,14 @@ class Attendance(models.Model):
         return f"{self.employee} - {self.date} ({self.status})"
 
 class Task(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='tasks')
+    assigned_to = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="assigned_tasks")
     title = models.CharField(max_length=100) #title of task field
     description = models.TextField() #description of task field
     assigned_date = models.DateField(auto_now_add=True) #date field for assigned date
     deadline = models.DateField() #date field for deadline
     complete = models.BooleanField(default=False)
+    
+
 
     class Meta():
         ordering = ['complete']

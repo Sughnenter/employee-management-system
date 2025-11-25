@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import EmployeeLoginView, EmployeeLogoutView, RegisterEmployeeView, DashboardView
+from .views import EmployeeLoginView, EmployeeLogoutView, RegisterEmployeeView, DashboardView, TaskCreate
 
 urlpatterns = [
     path('', DashboardView.as_view(), name='dashboard'),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('logout/', EmployeeLogoutView, name='logout'),
     path('register/', RegisterEmployeeView.as_view(), name='register'),
     path('task/<int:task_id>/complete/', views.complete_task, name='complete_task'),
+    path('task-create/', views.TaskCreate.as_view(), name='create_task'),
 ]

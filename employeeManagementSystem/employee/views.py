@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
@@ -17,6 +17,11 @@ from .forms import EmployeeCreationForm
 
 
 # Create your views here.
+
+class AdminOnlyMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.is_staff
+    
 class EmployeeLoginView(LoginView):
     template_name = 'employee/login.html'
     fields = '__all__'
@@ -54,7 +59,7 @@ class DashboardView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # Only show tasks assigned to the logged-in employee
-        return Task.objects.filter(employee=self.request.user).order_by('-deadline')
+        return Task.objects.filter(assigned_to=self.request.user).order_by('-deadline')
 
 @require_POST
 @login_required
@@ -65,16 +70,20 @@ def complete_task(request, task_id):
     task.save()
     return JsonResponse({'success': True})
 
-class TaskCreate(LoginRequiredMixin, CreateView):
+class TaskCreate(LoginRequiredMixin, CreateView, AdminOnlyMixin):
     model = Task
     # include deadline so users can set it; assigned_date is auto-set by the model
-    fields = ['title', 'description', 'deadline', 'complete']
+    template_name = 'employee/task_create.html'
+    fields = ['title', 'description', 'deadline', 'assigned_to']
     success_url = reverse_lazy('tasks')
 
     def form_valid(self, form):
-        # The Task model has an `employee` ForeignKey — set that to the logged-in user
-        form.instance.employee = self.request.user
-        return super(TaskCreate, self).form_valid(form)
+        return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['assigned_to'].queryset = Employee.objects.all()
+        return form
 
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
