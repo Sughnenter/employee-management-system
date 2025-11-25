@@ -18,9 +18,16 @@ from .forms import EmployeeCreationForm
 
 # Create your views here.
 
-class AdminOnlyMixin(UserPassesTestMixin):
+class AdminOnlyMixin(UserPassesTestMixin, ListView):
+    model = Employee
+    
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.is_staff
+        # Only allow superusers
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        # Custom redirect or message
+        return redirect('dashboard')
     
 class EmployeeLoginView(LoginView):
     template_name = 'employee/login.html'

@@ -87,14 +87,11 @@ class Task(models.Model):
     deadline = models.DateField() #date field for deadline
     complete = models.BooleanField(default=False)
     
-
-
     class Meta():
         ordering = ['complete']
 
-
     def __str__(self):
-        return f"{self.title} ({self.employee})"
+        return f"{self.title} ({self.assigned_to.full_name})"
 
 class LeaveRequest(models.Model):
     STATUS_CHOICES = [
