@@ -5,10 +5,8 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
 from django.views.generic.list import ListView
@@ -66,9 +64,14 @@ class DashboardView(LoginRequiredMixin, ListView):
     template_name = 'employee/dashboard.html'
     context_object_name = 'tasks'
 
-    def get_queryset(self):
-        # Only show tasks assigned to the logged-in employee
-        return Task.objects.filter(assigned_to=self.request.user).order_by('-deadline')
+    # def get_queryset(self):
+    #     # Only show tasks assigned to the logged-in employee
+    #     return Task.objects.filter(assigned_to=self.request.user).order_by('-deadline')
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['tasks'] = Task.objects.filter(assigned_to=self.request.user).order_by('-deadline')
+        ctx['leave_requests'] = LeaveRequest.objects.filter(employee=self.request.user)
+        return ctx
 
 
 class TaskCreate(LoginRequiredMixin, CreateView, AdminOnlyMixin):
@@ -145,4 +148,24 @@ def update_leave_status(request, pk, action):
         leave_request.status = "Rejected"
 
     leave_request.save()
-    return redirect("leave-approve")    
+    return redirect("leave_approve")    
+
+class EmployeeDetailView(DetailView):
+    model = Employee
+    template_name = 'employee/employee_detail.html'
+    context_object_name = 'employee'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        employee = self.get_object()
+
+        context['tasks'] = Task.objects.filter(assigned_to=employee)
+        context['leave_requests'] = LeaveRequest.objects.filter(employee=employee)
+
+        return context
+
+class EmployeeListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
+    model = Employee
+    template_name = 'employee/employee_list.html'
+    context_object_name = 'employees'
+    

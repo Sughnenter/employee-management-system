@@ -1,0 +1,93 @@
+{% extends 'employee/base.html' %}
+{% block content %}
+<div class="p-8 space-y-10">
+
+  <!-- Header Card -->
+  <div class="bg-gray-800 text-white p-8 rounded-2xl shadow-lg">
+    <h1 class="text-3xl font-bold">{{ employee.full_name }}</h1>
+    <p class="text-gray-300 mt-2">{{ employee.position }}</p>
+    <p class="text-gray-400 mt-1">{{ employee.email }}</p>
+  </div>
+
+  <!-- Grid: Info / Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Personal Info -->
+    <div class="bg-gray-900 p-6 rounded-2xl shadow border border-gray-700">
+      <h2 class="text-xl font-semibold text-white mb-4">Personal Information</h2>
+      <ul class="text-gray-400 space-y-2">
+        <li><strong class="text-gray-300">Phone:</strong> {{ employee.phone }}</li>
+        <li><strong class="text-gray-300">Department:</strong> {{ employee.department }}</li>
+        <li><strong class="text-gray-300">Position:</strong> {{ employee.position }}</li>
+        <li><strong class="text-gray-300">Joined:</strong> {{ employee.date_joined }}</li>
+      </ul>
+    </div>
+
+    <!-- Stats -->
+    <div class="bg-gray-900 p-6 rounded-2xl shadow border border-gray-700">
+      <h2 class="text-xl font-semibold text-white mb-4">Quick Stats</h2>
+      <ul class="text-gray-400 space-y-2">
+        <li><strong class="text-gray-300">Tasks Assigned:</strong> {{ tasks.count }}</li>
+        <li><strong class="text-gray-300">Completed Tasks:</strong> {{ tasks|filter:"complete"|length }}</li>
+        <li><strong class="text-gray-300">Leave Requests:</strong> {{ leave_requests.count }}</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Tasks Section -->
+  <div class="bg-gray-900 p-6 rounded-2xl shadow border border-gray-700">
+    <h2 class="text-2xl font-semibold text-white mb-4">Tasks</h2>
+
+    {% if tasks %}
+      <div class="space-y-4">
+        {% for task in tasks %}
+          <div class="p-4 rounded-xl bg-gray-800 flex justify-between border border-gray-700">
+            <div>
+              <h3 class="text-lg font-semibold text-white">{{ task.title }}</h3>
+              <p class="text-gray-400">{{ task.description }}</p>
+              <p class="text-gray-500 text-sm mt-1">Deadline: {{ task.deadline }}</p>
+            </div>
+
+            <span class="px-3 py-1 rounded text-sm self-start
+              {% if task.complete %}bg-green-700 text-green-200{% else %}bg-yellow-700 text-yellow-200{% endif %}
+            ">
+              {% if task.complete %}Completed{% else %}Pending{% endif %}
+            </span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-400">No tasks assigned.</p>
+    {% endif %}
+  </div>
+
+  <!-- Leave Requests Section -->
+  <div class="bg-gray-900 p-6 rounded-2xl shadow border border-gray-700">
+    <h2 class="text-2xl font-semibold text-white mb-4">Leave Requests</h2>
+
+    {% if leave_requests %}
+      <div class="space-y-4">
+      {% for leave in leave_requests %}
+        <div class="p-4 bg-gray-800 rounded-xl border border-gray-700">
+          <p class="text-white font-semibold">{{ leave.leave_type|upper }}</p>
+          <p class="text-gray-400 text-sm">{{ leave.start_date }} → {{ leave.end_date }}</p>
+          <p class="text-gray-500 mt-2">{{ leave.reason }}</p>
+
+          <span class="inline-block mt-3 px-3 py-1 rounded text-sm
+            {% if leave.status == 'Approved' %}bg-green-700 text-green-200
+            {% elif leave.status == 'Rejected' %}bg-red-700 text-red-200
+            {% else %}bg-yellow-600 text-yellow-200{% endif %}
+          ">
+            {{ leave.status }}
+          </span>
+        </div>
+      {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-gray-400">No leave requests submitted.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
