@@ -1,62 +1,37 @@
 {% extends "employee/base.html" %}
 {% block content %}
+<div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow">
 
-<div class="container mt-4">
-    <h2>Create Task</h2>
-
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
+    <h2 class="text-2xl font-bold mb-4">Assign Task</h2>
 
     <form method="POST">
         {% csrf_token %}
 
-        <div class="form-group mb-3">
-            <label for="title">Task Title</label>
-            <input 
-                type="text"
-                name="title"
-                id="title"
-                class="form-control"
-                placeholder="Enter task title"
-                required
-            >
+        <!-- render Django fields properly -->
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Title</label>
+            {{ form.title }}
         </div>
 
-        <div class="form-group mb-3">
-            <label for="description">Description</label>
-            <textarea
-                name="description"
-                id="description"
-                class="form-control"
-                rows="4"
-                placeholder="Enter task details"
-            ></textarea>
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Description</label>
+            {{ form.description }}
         </div>
 
-        <div class="form-group mb-3">
-            <label for="assigned_to">Assign To</label>
-            <select name="assigned_to" id="assigned_to" class="form-control" required>
-                <option value="">Select an employee</option>
-                {% for employee in employees %}
-                    <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</option>
-                {% endfor %}
-            </select>
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Deadline</label>
+            {{ form.deadline }}
         </div>
 
-        <div class="form-group mb-3">
-            <label for="due_date">Due Date</label>
-            <input 
-                type="date"
-                name="due_date"
-                id="due_date"
-                class="form-control"
-                required
-            >
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Assign To</label>
+            {{ form.assigned_to }}
         </div>
 
-        <button type="submit" class="btn btn-primary">Create Task</button>
+        <button type="submit"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Create Task
+        </button>
     </form>
 </div>
-
 {% endblock %}

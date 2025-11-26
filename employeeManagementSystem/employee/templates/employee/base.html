@@ -13,10 +13,17 @@
       <h1 class="text-xl font-semibold">Employee Management System</h1>
       <nav class="mt-2">
         {% if request.user.is_authenticated and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
-        <a href="{% url 'dashboard' %}" class="mr-4 text-blue-600 hover:underline">Dashboard</a>
-        <a href="{% url 'logout' %}" class="text-red-600 hover:underline">Logout</a>
-        {% endif %}
+          <a href="{% url 'dashboard' %}" class="mr-4 text-blue-600 hover:underline">Dashboard</a>
+          <a href="{% url 'logout' %}" class="text-red-600 hover:underline">Logout</a>
+          <a href="{% url 'leave_request' %}" class="text-gray-700 hover:underline mr-4">Leave Request</a>
 
+          {# Show Create Task link only to the specific admin email and only when authenticated #}
+          {% if request.user.email == 'shamaj2006@gmail.com' %}
+            <a href="{% url 'create_task' %}" class="text-green-600 hover:underline">Create task</a>
+            <a href="{% url 'leave_approve' %}" class="text-yellow-600 hover:underline">Approve leave requests</a>
+
+          {% endif %}
+        {% endif %}
       </nav>
     </header>
 

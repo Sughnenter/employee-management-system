@@ -1,0 +1,68 @@
+{% extends "employee/base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="max-w-5xl mx-auto mt-10">
+    <h1 class="text-3xl font-bold mb-6">Leave Requests</h1>
+
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <table class="min-w-full text-left text-sm">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-3">Employee</th>
+                    <th class="px-4 py-3">Leave Type</th>
+                    <th class="px-4 py-3">Period</th>
+                    <th class="px-4 py-3">Reason</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in leave_requests %}
+                <tr class="border-b">
+                    <td class="px-4 py-3">{{ req.employee.full_name }}</td>
+
+                    <td class="px-4 py-3 capitalize">
+                        {{ req.leave_type }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ req.start_date }} → {{ req.end_date }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ req.reason }}
+                    </td>
+
+                    <td class="px-4 py-3 font-semibold">
+                        {% if req.status == "Pending" %}
+                            <span class="text-yellow-600">Pending</span>
+                        {% elif req.status == "Approved" %}
+                            <span class="text-green-600">Approved</span>
+                        {% else %}
+                            <span class="text-red-600">Rejected</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="px-4 py-3 flex gap-2">
+                        {% if req.status == "Pending" %}
+                        <a href="{% url 'update-leave' req.id 'approve' %}" 
+                           class="px-3 py-1 bg-green-600 text-white rounded">
+                           Approve
+                        </a>
+                        <a href="{% url 'update-leave' req.id 'reject' %}" 
+                           class="px-3 py-1 bg-red-600 text-white rounded">
+                           Reject
+                        </a>
+                        {% else %}
+                        <span class="text-gray-500">No actions</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

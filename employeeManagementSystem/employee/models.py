@@ -99,11 +99,21 @@ class LeaveRequest(models.Model):
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
     ] # status choices for the leave request
+    LEAVE_TYPE=(
+        ('sick', 'SICK'),
+        ('annual', 'ANNUAL'),
+        ('unpaid', 'UNPAID'),
+        ('maternity', 'MATERNITY'),
+        ('paternity', 'PATERNITY'),
+        ('bereavement', 'BEREAVEMENT'),
+        ('other', 'OTHER'),
+        )
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='leave_requests')
     start_date = models.DateField() #date field for start date
     end_date = models.DateField() #date field for end date
     reason = models.TextField() #reason for leave field
+    leave_type = models.CharField(max_length=20, choices=LEAVE_TYPE, default='other') #leave type field with choices
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending') #status field with choices
     applied_on = models.DateField(auto_now_add=True) #date field for applied on
 

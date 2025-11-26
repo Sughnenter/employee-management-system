@@ -82,7 +82,7 @@ class TaskCreate(LoginRequiredMixin, CreateView, AdminOnlyMixin):
     # include deadline so users can set it; assigned_date is auto-set by the model
     template_name = 'employee/task_create.html'
     fields = ['title', 'description', 'deadline', 'assigned_to']
-    success_url = reverse_lazy('tasks')
+    success_url = reverse_lazy('dashboard')
 
     def form_valid(self, form):
         return super().form_valid(form)
@@ -104,4 +104,38 @@ class TaskUpdate(LoginRequiredMixin, UpdateView):
 class TaskDelete(LoginRequiredMixin, DeleteView):
     model = Task
     context_object_name = 'task'
-    success_url = reverse_lazy('tasks')
+    success_url = reverse_lazy('dashboard')
+
+class LeaveRequestCreateView(LoginRequiredMixin, CreateView):
+    model = LeaveRequest
+    template_name = 'employee/leave_request.html'
+    fields = ['start_date', 'end_date', 'reason']
+    success_url = reverse_lazy('dashboard')
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # set the employee FK before saving
+        form.instance.employee = self.request.user
+        return form
+
+class ApproveLeaveRequestView(LoginRequiredMixin, AdminOnlyMixin, ListView):
+    model = LeaveRequest
+    template_name = 'employee/leave_approval.html'
+    context_object_name = 'leave_requests'
+
+def update_leave_status(request, pk, action):
+    leave_request = get_object_or_404(LeaveRequest, pk=pk)
+
+    if not (request.user.is_staff or request.user.is_admin):
+        return redirect("dashboard")
+
+    if action == "approve":
+        leave_request.status = "Approved"
+    elif action == "reject":
+        leave_request.status = "Rejected"
+
+    leave_request.save()
+    return redirect("leave-approve")    
