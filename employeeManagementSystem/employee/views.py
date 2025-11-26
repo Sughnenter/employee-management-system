@@ -13,7 +13,9 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from .forms import EmployeeCreationForm
+from .forms import EmployeeCreationForm, LeaveRequestForm, TaskForm
+from datetime import date
+from django.views import View
 
 
 # Create your views here.
@@ -68,14 +70,6 @@ class DashboardView(LoginRequiredMixin, ListView):
         # Only show tasks assigned to the logged-in employee
         return Task.objects.filter(assigned_to=self.request.user).order_by('-deadline')
 
-@require_POST
-@login_required
-def complete_task(request, task_id):
-    task = get_object_or_404(Task, id=task_id, employee=request.user)
-    # Task model uses a boolean `complete` field, not a `status` string.
-    task.complete = True
-    task.save()
-    return JsonResponse({'success': True})
 
 class TaskCreate(LoginRequiredMixin, CreateView, AdminOnlyMixin):
     model = Task
@@ -91,6 +85,19 @@ class TaskCreate(LoginRequiredMixin, CreateView, AdminOnlyMixin):
         form = super().get_form(form_class)
         form.fields['assigned_to'].queryset = Employee.objects.all()
         return form
+
+class CompleteTaskView(LoginRequiredMixin, View):
+    def post(self, request, task_id):
+        task = get_object_or_404(Task, id=task_id)
+
+        # Security check — only the employee assigned can complete the task
+        if task.assigned_to != request.user:
+            return redirect('dashboard')   # or raise PermissionDenied
+
+        task.complete = True
+        task.save()
+
+        return redirect('dashboard')
 
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
@@ -109,7 +116,7 @@ class TaskDelete(LoginRequiredMixin, DeleteView):
 class LeaveRequestCreateView(LoginRequiredMixin, CreateView):
     model = LeaveRequest
     template_name = 'employee/leave_request.html'
-    fields = ['start_date', 'end_date', 'reason']
+    fields = ['start_date', 'end_date', 'reason', 'leave_type']
     success_url = reverse_lazy('dashboard')
 
     def form_valid(self, form):

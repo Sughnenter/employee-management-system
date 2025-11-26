@@ -9,29 +9,29 @@
     <form method="POST" class="space-y-5">
     {% csrf_token %}
     
-      <div class="mb-4">
+        <div class="mb-4">
             <label class="block font-semibold mb-1">Leave Type</label>
             {{ form.leave_type }}
         </div>
-      <div>
-          <label class="block font-semibold mb-1">Start Date</label>
-          {{ form.start_date }}
-      </div>
+        <div>
+            <label class="block font-semibold mb-1">Start Date</label>
+            {{ form.start_date }}
+        </div>
 
-      <div>
-          <label class="block font-semibold mb-1">End Date</label>
-          {{ form.end_date }}
-      </div>
+        <div>
+            <label class="block font-semibold mb-1">End Date</label>
+            {{ form.end_date }}
+        </div>
 
-      <div>
-          <label class="block font-semibold mb-1">Reason</label>
-          {{ form.reason }}
-      </div>
+        <div>
+            <label class="block font-semibold mb-1">Reason</label>
+            {{ form.reason }}
+        </div>
 
-        <button 
-          type="submit" 
-          class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
-      >
+            <button 
+            type="submit" 
+            class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+        >
         Submit Request
         </button>
     </form>

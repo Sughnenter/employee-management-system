@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import EmployeeLoginView, EmployeeLogoutView, RegisterEmployeeView, DashboardView, TaskCreate, LeaveRequestCreateView, ApproveLeaveRequestView, update_leave_status
+from .views import EmployeeLoginView, EmployeeLogoutView, RegisterEmployeeView, DashboardView, TaskCreate, LeaveRequestCreateView, ApproveLeaveRequestView, update_leave_status, CompleteTaskView,
 
 urlpatterns = [
     path('', DashboardView.as_view(), name='dashboard'),
@@ -12,5 +12,6 @@ urlpatterns = [
     path('leave-request/', views.LeaveRequestCreateView.as_view(), name='leave_request'),
     path('leave-approval/', views.ApproveLeaveRequestView.as_view(), name='leave_approve'),
     path("leave/<int:pk>/<str:action>/", update_leave_status, name="update-leave"),
-    
+    path('task/<int:task_id>/complete/', CompleteTaskView.as_view(), name='complete_task'),
+
 ]
