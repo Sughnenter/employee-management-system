@@ -21,6 +21,7 @@
           {% if request.user.email == 'shamaj2006@gmail.com' %}
             <a href="{% url 'create_task' %}" class="text-green-600 hover:underline">Create task</a>
             <a href="{% url 'leave_approve' %}" class="text-yellow-600 hover:underline">Approve leave requests</a>
+            <a href="{% url 'employee_list' %}" class="text-black-600 hover:underline">View employee records</a>
 
           {% endif %}
         {% endif %}

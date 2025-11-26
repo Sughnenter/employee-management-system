@@ -159,8 +159,9 @@ class EmployeeDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         employee = self.get_object()
 
-        context['tasks'] = Task.objects.filter(assigned_to=employee)
-        context['leave_requests'] = LeaveRequest.objects.filter(employee=employee)
+        context['tasks'] = employee.assigned_tasks.all()
+        context['completed_tasks'] = employee.assigned_tasks.filter(complete=True).count()
+        context['leave_requests'] = employee.leave_requests.all()
 
         return context
 

@@ -40,6 +40,12 @@ class TaskForm(ModelForm):
             field.widget.attrs.update({
                 "class": "w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 mb-3"
             })
+    widgets = {
+            'deadline': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'w-full p-2 bg-gray-800 text-white border border-gray-600 rounded-lg'
+            })
+        }        
 
 class LeaveRequestForm(ModelForm):
     class Meta:
