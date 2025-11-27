@@ -20,7 +20,7 @@ import csv
 
 # Create your views here.
 
-class AdminOnlyMixin(UserPassesTestMixin, ListView):
+class AdminOnlyMixin(UserPassesTestMixin):
     model = Employee
     
     def test_func(self):
@@ -63,14 +63,16 @@ class RegisterEmployeeView(FormView):
 
 class DeleteEmployeeView(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
     model = Employee
-    template_name = 'employee/employee_confirm_delete.html'
+    template_name = 'employee/employee_delete.html'
     success_url = reverse_lazy('employee_list')
 
 class UpdateEmployeeView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
     model = Employee
-    template_name = 'employee/employee_update.html'
-    fields = "__all__"
-    success_url = reverse_lazy('employee_list')
+    fields = ['full_name', 'position', 'employment_date', 'phone_number', 'address', 'employee_id', "department"] 
+    template_name = "employee/employee_update.html"
+    success_url = reverse_lazy("employee_list")
+
+    
 
 class DashboardView(LoginRequiredMixin, ListView):
     model = Task
@@ -205,15 +207,20 @@ def export_employees_csv(request):
     response["Content-Disposition"] = 'attachment; filename="employees.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(["Full Name", "Email", "Department", "Position", "Joined"])
+    writer.writerow(["Full Name", "Email", "Gender", "Date of Birth", "Employment date", "Phone number", "Address", "ID" "Department", "Position",])
 
     for emp in Employee.objects.all():
         writer.writerow([
             emp.full_name,
             emp.email,
+            emp.gender,
+            emp.date_of_birth,
+            emp.employment_date,
+            emp.phone_number,
+            emp.address,
+            emp.employee_id,
             emp.department,
             emp.get_position_display(),  # Get human-readable choice label
-            emp.date_joined
         ])
 
     return response
