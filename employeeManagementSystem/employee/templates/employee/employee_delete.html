@@ -1,0 +1,28 @@
+{% extends "employee/base.html" %}
+{% block content %}
+
+<div class="max-w-xl mx-auto p-6 bg-gray-900 rounded-2xl border border-gray-700 text-center">
+
+  <h1 class="text-3xl text-white font-bold mb-4">Delete Employee</h1>
+  <p class="text-gray-300 mb-6">
+    Are you sure you want to delete 
+    <span class="font-semibold text-red-400">{{ object.full_name }}</span>?
+  </p>
+
+  <form method="POST" class="flex justify-center space-x-4">
+    {% csrf_token %}
+
+    <a href="{% url 'employee-list' %}" 
+        class="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600">
+      Cancel
+    </a>
+
+    <button type="submit" 
+      class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+      Delete
+    </button>
+  </form>
+
+</div>
+
+{% endblock %}

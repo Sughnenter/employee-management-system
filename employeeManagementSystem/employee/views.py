@@ -4,7 +4,6 @@ from .models import Employee, Task, LeaveRequest
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.decorators.http import require_POST
@@ -14,6 +13,9 @@ from django.views.generic.detail import DetailView
 from .forms import EmployeeCreationForm, LeaveRequestForm, TaskForm
 from datetime import date
 from django.views import View
+from django.http import HttpResponse, HttpResponseForbidden
+from django.db.models import Q
+import csv
 
 
 # Create your views here.
@@ -58,6 +60,17 @@ class RegisterEmployeeView(FormView):
         if self.request.user .is_authenticated:
             return redirect ('dashboard')
         return super(RegisterEmployeeView, self).get(*args, **kwargs)
+
+class DeleteEmployeeView(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
+    model = Employee
+    template_name = 'employee/employee_confirm_delete.html'
+    success_url = reverse_lazy('employee_list')
+
+class UpdateEmployeeView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
+    model = Employee
+    template_name = 'employee/employee_update.html'
+    fields = "__all__"
+    success_url = reverse_lazy('employee_list')
 
 class DashboardView(LoginRequiredMixin, ListView):
     model = Task
@@ -169,4 +182,38 @@ class EmployeeListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
     model = Employee
     template_name = 'employee/employee_list.html'
     context_object_name = 'employees'
-    
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        q = self.request.GET.get("q")
+
+        if q:
+            qs = qs.filter(
+                Q(full_name__icontains=q) |
+                Q(email__icontains=q) |
+                Q(department__icontains=q)
+            )
+        return qs
+
+
+def export_employees_csv(request):
+    """Export all employees to CSV; only superusers allowed."""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("You do not have permission to export employees.")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="employees.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(["Full Name", "Email", "Department", "Position", "Joined"])
+
+    for emp in Employee.objects.all():
+        writer.writerow([
+            emp.full_name,
+            emp.email,
+            emp.department,
+            emp.get_position_display(),  # Get human-readable choice label
+            emp.date_joined
+        ])
+
+    return response
