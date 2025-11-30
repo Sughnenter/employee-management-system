@@ -1,0 +1,39 @@
+{% extends "employee/base.html" %}
+{% block content %}
+
+<div class="p-6">
+
+  <h1 class="text-3xl text-white font-bold mb-6">Admin Analytics</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="bg-gray-900 p-6 rounded-xl shadow text-white">
+      <h2 class="text-lg text-gray-400">Total Employees</h2>
+      <p class="text-3xl font-bold">{{ employee_count }}</p>
+    </div>
+
+    <div class="bg-gray-900 p-6 rounded-xl shadow text-white">
+      <h2 class="text-lg text-gray-400">Pending Tasks</h2>
+      <p class="text-3xl font-bold">{{ active_tasks }}</p>
+    </div>
+
+    <div class="bg-gray-900 p-6 rounded-xl shadow text-white">
+      <h2 class="text-lg text-gray-400">Completed Tasks</h2>
+      <p class="text-3xl font-bold">{{ completed_tasks }}</p>
+    </div>
+
+    <div class="bg-gray-900 p-6 rounded-xl shadow text-white">
+      <h2 class="text-lg text-gray-400">Pending Leave</h2>
+      <p class="text-3xl font-bold">{{ pending_leave }}</p>
+    </div>
+
+    <div class="bg-gray-900 p-6 rounded-xl shadow text-white">
+      <h2 class="text-lg text-gray-400">Approved Leave</h2>
+      <p class="text-3xl font-bold">{{ approved_leave }}</p>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

@@ -16,7 +16,10 @@ from django.views import View
 from django.http import HttpResponse, HttpResponseForbidden
 from django.db.models import Q
 import csv
-
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from django.views.generic import TemplateView
+from django.db.models import Count
 
 # Create your views here.
 
@@ -68,7 +71,7 @@ class DeleteEmployeeView(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
 
 class UpdateEmployeeView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
     model = Employee
-    fields = ['full_name', 'position', 'employment_date', 'phone_number', 'address', 'employee_id', "department"] 
+    fields = ['full_name', 'position', 'employment_date', 'phone_number', 'address', "department"] 
     template_name = "employee/employee_update.html"
     success_url = reverse_lazy("employee_list")
 
@@ -195,20 +198,24 @@ class EmployeeListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
                 Q(email__icontains=q) |
                 Q(department__icontains=q)
             )
+        department = self.request.GET.get("department")
+        if department and department != "all":
+            qs = qs.filter(department=department)
+
         return qs
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["departments"] = Employee.objects.values_list("department", flat=True).distinct()
+        return ctx
 
 
 def export_employees_csv(request):
-    """Export all employees to CSV; only superusers allowed."""
     if not request.user.is_superuser:
         return HttpResponseForbidden("You do not have permission to export employees.")
-
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="employees.csv"'
-
     writer = csv.writer(response)
-    writer.writerow(["Full Name", "Email", "Gender", "Date of Birth", "Employment date", "Phone number", "Address", "ID" "Department", "Position",])
-
+    writer.writerow(["Full Name", "Email", "Gender", "Date of Birth", "Employment date", "Phone number", "Address", "ID" "Department", "Position"])
     for emp in Employee.objects.all():
         writer.writerow([
             emp.full_name,
@@ -224,3 +231,47 @@ def export_employees_csv(request):
         ])
 
     return response
+class ExportEmployeesPDFView(LoginRequiredMixin, AdminOnlyMixin, View):
+    def get(self, request):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="employees.pdf"'
+
+        p = canvas.Canvas(response, pagesize=letter)
+        y = 750
+
+        employees = Employee.objects.all()
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, 770, "Employee Report")
+        p.setFont("Helvetica", 10)
+
+        for emp in employees:
+            p.drawString(50, y, f"{emp.full_name} | {emp.email} | {emp.department}")
+            y -= 20
+            if y < 50:
+                p.showPage()
+                y = 750
+
+        p.save()
+        return response
+
+class AdminAnalyticsView(LoginRequiredMixin, AdminOnlyMixin, TemplateView):
+    template_name = "employee/analytics.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        ctx["employee_count"] = Employee.objects.count()
+        ctx["active_tasks"] = Task.objects.filter(complete=False).count()
+        ctx["completed_tasks"] = Task.objects.filter(complete=True).count()
+        ctx["pending_leave"] = LeaveRequest.objects.filter(status="Pending").count()
+        ctx["approved_leave"] = LeaveRequest.objects.filter(status="Approved").count()
+
+        # For charts later:
+        ctx["department_distribution"] = (
+            Employee.objects.values("department")
+            .annotate(count=Count("id"))
+            .order_by("-count")
+        )
+
+        return ctx

@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import EmployeeLoginView, EmployeeLogoutView, RegisterEmployeeView, DashboardView, TaskCreate, LeaveRequestCreateView, ApproveLeaveRequestView, update_leave_status, CompleteTaskView, EmployeeDetailView, EmployeeListView, export_employees_csv, DeleteEmployeeView, UpdateEmployeeView
+from .views import EmployeeLoginView, EmployeeLogoutView, RegisterEmployeeView, DashboardView, TaskCreate, LeaveRequestCreateView, ApproveLeaveRequestView, update_leave_status, CompleteTaskView, EmployeeDetailView, EmployeeListView, export_employees_csv, DeleteEmployeeView, UpdateEmployeeView, ExportEmployeesPDFView, AdminAnalyticsView
 
 urlpatterns = [
     path('', DashboardView.as_view(), name='dashboard'),
@@ -17,5 +17,9 @@ urlpatterns = [
     path('export-employees/', views.export_employees_csv, name='export_employees_csv'),
     path('employee/<int:pk>/delete/', DeleteEmployeeView.as_view(), name='delete_employee'),
     path('employee/<int:pk>/update/', UpdateEmployeeView.as_view(), name='update_employee'),
+    path("export/pdf/", ExportEmployeesPDFView.as_view(), name="export_pdf"),
+    path("admin/analytics/", AdminAnalyticsView.as_view(), name="admin_analytics"),
+
+
 
 ]

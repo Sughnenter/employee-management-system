@@ -19,6 +19,35 @@
     class="bg-blue-600 px-4 py-2 text-white rounded-lg">
     Export CSV
     </a>
+    <a href="{% url 'export_pdf' %}"
+    class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white">
+    Export PDF
+    </a>
+
+
+    <form method="GET" class="flex gap-4">
+
+      <!-- Search -->
+      <input type="text" name="search" value="{{ request.GET.search }}"
+              class="px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+              placeholder="Search employees...">
+
+      <!-- Department Filter -->
+      <select name="department"
+              class="px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600">
+          <option value="all">All Departments</option>
+          {% for dep in departments %}
+              <option value="{{ dep }}" {% if request.GET.department == dep %}selected{% endif %}>
+                  {{ dep }}
+              </option>
+          {% endfor %}
+      </select>
+
+      <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+          Apply
+      </button>
+    </form>
+
 
 
   </div>
