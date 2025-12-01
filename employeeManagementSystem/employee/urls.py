@@ -18,7 +18,7 @@ urlpatterns = [
     path('employee/<int:pk>/delete/', DeleteEmployeeView.as_view(), name='delete_employee'),
     path('employee/<int:pk>/update/', UpdateEmployeeView.as_view(), name='update_employee'),
     path("export/pdf/", ExportEmployeesPDFView.as_view(), name="export_pdf"),
-    path("admin/analytics/", AdminAnalyticsView.as_view(), name="admin_analytics"),
+    path("analytics/", AdminAnalyticsView.as_view(), name="analytics"),
 
 
 
