@@ -6,6 +6,9 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow">
+  <img src="{% static 'logo.png' %}"
+    class="mx-auto h-12 mb-3"
+    alt="YNV Corp">
   <h2 class="text-3xl font-bold mb-6 text-center">Create Employee Account</h2>
 
   <form method="POST" novalidate>
@@ -13,12 +16,14 @@
 
     {% for field in form %}
       <div class="mb-4">
-        <label class="block font-medium mb-1">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-          <p class="text-red-600 text-sm mt-1">{{ field.errors.0 }}</p>
-        {% endif %}
-      </div>
+            <label class="block font-medium mb-1">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+                <p class="text-red-500 text-sm">{{ field.errors }}</p>
+            {% endif %}
+        </div>
     {% endfor %}
     <p>Already Registered <a href="{% url 'login' %}">login</a></p>
     <button

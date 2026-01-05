@@ -92,20 +92,17 @@ class DashboardView(LoginRequiredMixin, ListView):
         return ctx
 
 
-class TaskCreate(LoginRequiredMixin, CreateView, AdminOnlyMixin):
+class TaskCreate(AdminOnlyMixin, LoginRequiredMixin, CreateView):
     model = Task
-    # include deadline so users can set it; assigned_date is auto-set by the model
     template_name = 'employee/task_create.html'
     fields = ['title', 'description', 'deadline', 'assigned_to']
     success_url = reverse_lazy('dashboard')
-
-    def form_valid(self, form):
-        return super().form_valid(form)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['assigned_to'].queryset = Employee.objects.all()
         return form
+
 
 class CompleteTaskView(LoginRequiredMixin, View):
     def post(self, request, task_id):

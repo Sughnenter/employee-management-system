@@ -9,17 +9,21 @@ class EmployeeCreationForm(UserCreationForm):
         fields = [
             'full_name',
             'email',
-            'gender',        # dropdown
-            'position',      # dropdown
+            'gender',
             'date_of_birth',
             'employment_date',
+            'position',
+            'department',
             'phone_number',
             'address',
             'employee_id',
-            'department',
             'password1',
             'password2'
         ]
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'employment_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

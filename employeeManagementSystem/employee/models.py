@@ -27,16 +27,16 @@ class Employee(AbstractUser):
         ('other', 'OTHER'),
     )
     
-    full_name = models.CharField(max_length=200, null=True)
-    email = models.EmailField(unique=True, null=True)
+    full_name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(unique=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    position = models.CharField(max_length=200, null=True, choices=POSITION_CHOICES)
+    position = models.CharField(max_length=200, blank=True, choices=POSITION_CHOICES)
     date_of_birth = models.DateField(null=True)
     employment_date = models.DateField(default=date.today)
-    phone_number = models.CharField(max_length=15, null=True)
-    address = models.CharField(max_length=200, null=True)
-    employee_id = models.CharField(max_length=20, unique=True, null=True)
-    department = models.CharField(max_length=100, null=True)
+    phone_number = models.CharField(max_length=15, blank=True)
+    address = models.CharField(max_length=200, blank=True)
+    employee_id = models.CharField(max_length=20, unique=True, blank=True)
+    department = models.CharField(max_length=100, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
