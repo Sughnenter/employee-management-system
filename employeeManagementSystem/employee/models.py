@@ -13,7 +13,7 @@ class Employee(AbstractUser):
         ('developer', 'DEVELOPER'),
         ('designer', 'DESIGNER'),
         ('tester', 'TESTER'),
-        ('hr', 'HR'),
+        ('hr manager', 'HR MANAGER'),
         ('intern', 'INTERN'),
         ('software engineer', 'SOFTWARE ENGINEER'),
         ('data scientist', 'DATA SCIENTIST'),
@@ -26,7 +26,16 @@ class Employee(AbstractUser):
         ('it consultant', 'IT CONSULTANT'),
         ('other', 'OTHER'),
     )
-    
+    DEPARTMENT_CHOICES=(
+        ('sales', 'SALES'),
+        ('resarch & development', 'RESEARCH & DEVELOPMENT'),
+        ('software development', 'SOFTWARE DEVELOPMENT'),
+        ('product research', 'PRODUCT RESEARCH'),
+        ('marketing', 'MARKETING'),
+        ('human resource', 'HUMAN RESOURCE'),
+        ('legal','LEGAL'),
+        ('customer service', 'CUSTOMER SERVICE')
+    )
     full_name = models.CharField(max_length=200, blank=True)
     email = models.EmailField(unique=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
@@ -36,7 +45,7 @@ class Employee(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True)
     address = models.CharField(max_length=200, blank=True)
     employee_id = models.CharField(max_length=20, unique=True, blank=True)
-    department = models.CharField(max_length=100, blank=True)
+    department = models.CharField(max_length=100, blank=True, choices=DEPARTMENT_CHOICES)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
