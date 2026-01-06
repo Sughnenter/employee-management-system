@@ -37,6 +37,7 @@ class Employee(AbstractUser):
         ('customer service', 'CUSTOMER SERVICE')
     )
     full_name = models.CharField(max_length=200, blank=True)
+    username = None
     email = models.EmailField(unique=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     position = models.CharField(max_length=200, blank=True, choices=POSITION_CHOICES)
