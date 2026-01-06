@@ -48,7 +48,7 @@ class Employee(AbstractUser):
     department = models.CharField(max_length=100, blank=True, choices=DEPARTMENT_CHOICES)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = []
 
     def save(self, *args, **kwargs):
         # Only generate employee_id if it doesn’t exist
