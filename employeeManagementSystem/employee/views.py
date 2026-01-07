@@ -20,6 +20,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from django.views.generic import TemplateView
 from django.db.models import Count
+from django.utils import timezone
 
 # Create your views here.
 
@@ -78,17 +79,35 @@ class UpdateEmployeeView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
     
 
 class DashboardView(LoginRequiredMixin, ListView):
-    model = Task
+    model = Task, LeaveRequest
     template_name = 'employee/dashboard.html'
     context_object_name = 'tasks'
 
-    # def get_queryset(self):
-    #     # Only show tasks assigned to the logged-in employee
-    #     return Task.objects.filter(assigned_to=self.request.user).order_by('-deadline')
+    def get_queryset(self):
+        today = timezone.now().date()
+        return Task.objects.filter(
+            assigned_to=self.request.user,
+            complete=False,
+            deadline__gte=today
+        ).order_by('deadline')
+        return LeaveRequest.objects.filter(
+            assigned_to=self.request.user,
+            complete=False,
+            deadline__gte=today
+        ).order_by('deadline')
+        
     def get_context_data(self, **kwargs):
+        today = timezone.now().date()
         ctx = super().get_context_data(**kwargs)
-        ctx['tasks'] = Task.objects.filter(assigned_to=self.request.user).order_by('-deadline')
-        ctx['leave_requests'] = LeaveRequest.objects.filter(employee=self.request.user)
+        ctx['leave_requests'] = LeaveRequest.objects.filter(
+            employee=self.request.user
+        )
+        ctx['overdue_tasks'] = Task.objects.filter(
+            assigned_to=self.request.user,
+            complete=False,
+            deadline__lt=today
+        )
+        
         return ctx
 
 
