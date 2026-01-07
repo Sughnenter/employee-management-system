@@ -92,31 +92,27 @@ class DashboardView(LoginRequiredMixin, ListView):
         ).order_by('deadline')
         
     def get_context_data(self, **kwargs):
-        today = timezone.now().date()
         ctx = super().get_context_data(**kwargs)
-        ctx['leave_requests'] = LeaveRequest.objects.filter(
-            employee=self.request.user
-        )
+        today = timezone.now().date()
+
         ctx['overdue_tasks'] = Task.objects.filter(
             assigned_to=self.request.user,
             complete=False,
             deadline__lt=today
         )
+
         ctx['active_leaves'] = LeaveRequest.objects.filter(
             employee=self.request.user,
             status='Approved',
             end_date__gte=today
         )
 
-        ctx['past_leaves'] = LeaveRequest.objects.filter(
+        ctx['recent_rejected_leaves'] = LeaveRequest.objects.filter(
             employee=self.request.user,
-            end_date__lt=today
+            status='Rejected',
+            updated_at__gte=timezone.now() - timedelta(days=3)
         )
-        ctx['rejected_leaves'] = LeaveRequest.objects.filter(
-            employee=self.request.user,
-            status='Rejected'
-        )
-        
+
         return ctx
 
 
