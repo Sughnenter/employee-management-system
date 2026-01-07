@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from .forms import EmployeeCreationForm, LeaveRequestForm, TaskForm
-from datetime import date
+from datetime import date, timedelta
 from django.views import View
 from django.http import HttpResponse, HttpResponseForbidden
 from django.db.models import Q
@@ -90,11 +90,6 @@ class DashboardView(LoginRequiredMixin, ListView):
             complete=False,
             deadline__gte=today
         ).order_by('deadline')
-        return LeaveRequest.objects.filter(
-            assigned_to=self.request.user,
-            complete=False,
-            deadline__gte=today
-        ).order_by('deadline')
         
     def get_context_data(self, **kwargs):
         today = timezone.now().date()
@@ -106,6 +101,20 @@ class DashboardView(LoginRequiredMixin, ListView):
             assigned_to=self.request.user,
             complete=False,
             deadline__lt=today
+        )
+        ctx['active_leaves'] = LeaveRequest.objects.filter(
+            employee=self.request.user,
+            status='Approved',
+            end_date__gte=today
+        )
+
+        ctx['past_leaves'] = LeaveRequest.objects.filter(
+            employee=self.request.user,
+            end_date__lt=today
+        )
+        ctx['rejected_leaves'] = LeaveRequest.objects.filter(
+            employee=self.request.user,
+            status='Rejected'
         )
         
         return ctx
