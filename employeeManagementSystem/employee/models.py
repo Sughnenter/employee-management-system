@@ -126,6 +126,7 @@ class LeaveRequest(models.Model):
     leave_type = models.CharField(max_length=20, choices=LEAVE_TYPE, default='other') #leave type field with choices
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending') #status field with choices
     applied_on = models.DateField(auto_now_add=True) #date field for applied on
+    updated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-applied_on']
