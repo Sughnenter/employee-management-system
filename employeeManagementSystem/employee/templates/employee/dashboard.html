@@ -48,6 +48,32 @@
     {% endfor %}
   </div>
 
+  <!-- Overdue Tasks -->
+{% if overdue_tasks %}
+  <h2 class="text-xl font-semibold mt-8 mb-4 text-red-500">
+    ⚠ Overdue Tasks
+  </h2>
+
+  <div class="space-y-4">
+    {% for task in overdue_tasks %}
+      <div class="p-4 rounded-lg bg-red-900/30 border border-red-600">
+        <h3 class="font-semibold text-red-400">
+          {{ task.title }}
+        </h3>
+
+        <p class="text-red-300">
+          {{ task.description }}
+        </p>
+
+        <p class="text-sm text-red-400 font-semibold">
+          Deadline missed: {{ task.deadline }}
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+
   <!-- Leave Requests Section -->
   <h2 class="text-xl text-white mb-3 font-semibold mt-10">Your Leave Requests</h2>
 
