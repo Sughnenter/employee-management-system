@@ -22,6 +22,7 @@ from django.views.generic import TemplateView
 from django.db.models import Count
 from django.utils import timezone
 
+
 # Create your views here.
 
 class AdminOnlyMixin(UserPassesTestMixin):
@@ -92,27 +93,30 @@ class DashboardView(LoginRequiredMixin, ListView):
         ).order_by('deadline')
         
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
         today = timezone.now().date()
-
+        ctx = super().get_context_data(**kwargs)
+        ctx['leave_requests'] = LeaveRequest.objects.filter(
+            employee=self.request.user
+        )
         ctx['overdue_tasks'] = Task.objects.filter(
             assigned_to=self.request.user,
             complete=False,
             deadline__lt=today
         )
-
+        
         ctx['active_leaves'] = LeaveRequest.objects.filter(
             employee=self.request.user,
             status='Approved',
             end_date__gte=today
         )
 
+        # Recently rejected (for alert)
         ctx['recent_rejected_leaves'] = LeaveRequest.objects.filter(
             employee=self.request.user,
             status='Rejected',
             updated_at__gte=timezone.now() - timedelta(days=3)
         )
-
+        
         return ctx
 
 
@@ -157,18 +161,18 @@ class TaskDelete(LoginRequiredMixin, DeleteView):
 
 class LeaveRequestCreateView(LoginRequiredMixin, CreateView):
     model = LeaveRequest
+    form_class = LeaveRequestForm
     template_name = 'employee/leave_request.html'
-    fields = ['start_date', 'end_date', 'reason', 'leave_type']
     success_url = reverse_lazy('dashboard')
 
-    def form_valid(self, form):
-        return super().form_valid(form)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['employee'] = self.request.user
+        return kwargs
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # set the employee FK before saving
+    def form_valid(self, form):
         form.instance.employee = self.request.user
-        return form
+        return super().form_valid(form)
 
 class ApproveLeaveRequestView(LoginRequiredMixin, AdminOnlyMixin, ListView):
     model = LeaveRequest

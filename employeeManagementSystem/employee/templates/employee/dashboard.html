@@ -14,7 +14,7 @@
   </div>
 
   <!-- Tasks Section -->
-  <h2 class="text-xl text-white mb-3 font-semibold">Your Tasks</h2>
+  <h2 class="text-xl text-black mb-3 font-semibold">Your Tasks</h2>
   <div class="grid gap-4">
 
     {% for task in tasks %}
@@ -61,7 +61,7 @@
           {{ task.title }}
         </h3>
 
-        <p class="text-red-300">
+        <p class="text-red-400 font-semibold">
           {{ task.description }}
         </p>
 
@@ -75,37 +75,44 @@
 
 
   <!-- Leave Requests Section -->
-  <h2 class="text-xl text-white mb-3 font-semibold mt-10">Your Leave Requests</h2>
 
-  <div class="grid gap-4">
 
-    {% for leave in leave_requests %}
-    <div class="bg-gray-900 border border-gray-700 p-5 rounded-xl shadow">
 
-      <h3 class="text-lg font-semibold text-white">Leave: {{ leave.leave_type|upper }}</h3>
-      <p class="text-gray-400 text-sm mt-1">{{ leave.reason }}</p>
+  <h2 class="text-xl text-white mb-3 font-semibold">Your Leave Requests</h2>
 
-      <p class="text-gray-500 text-sm mt-2">
-        From: {{ leave.start_date }} — To: {{ leave.end_date }}
-      </p>
+<div class="grid gap-4">
+  {% for leave in leave_requests %}
+  <div class="bg-gray-900 border border-gray-700 p-5 rounded-xl shadow">
 
-      <p class="mt-2">
-        Status:
-        {% if leave.status == "Approved" %}
+    <h3 class="text-lg font-semibold text-white">
+      {{ leave.leave_type|upper }}
+    </h3>
+
+    <p class="text-gray-400 text-sm mt-1">{{ leave.reason }}</p>
+
+    <p class="text-gray-500 text-sm mt-2">
+      {{ leave.start_date }} → {{ leave.end_date }}
+    </p>
+
+    <p class="mt-2">
+      Status:
+      {% if leave.status == "Approved" %}
         <span class="text-green-400 font-semibold">Approved</span>
-        {% elif leave.status == "Rejected" %}
+      {% elif leave.status == "Rejected" %}
         <span class="text-red-400 font-semibold">Rejected</span>
-        {% else %}
+      {% else %}
         <span class="text-yellow-400 font-semibold">Pending</span>
-        {% endif %}
-      </p>
-
-    </div>
-    {% empty %}
-    <p class="text-gray-400 text-center">No leave requests made yet.</p>
-    {% endfor %}
+      {% endif %}
+    </p>
 
   </div>
+  {% empty %}
+    <p class="text-gray-400 text-center">
+      No leave requests made yet.
+    </p>
+  {% endfor %}
+</div>
+
 
 </div>
 
