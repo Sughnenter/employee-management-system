@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from datetime import date
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 class Employee(AbstractUser):
@@ -89,6 +90,7 @@ class Attendance(models.Model):
         # Use the employee's __str__ to avoid relying on username attribute
         return f"{self.employee} - {self.date} ({self.status})"
 
+MAX_ACTIVE_TASKS = 5
 class Task(models.Model):
     assigned_to = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="assigned_tasks")
     title = models.CharField(max_length=100) #title of task field
@@ -102,6 +104,21 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.assigned_to.full_name})"
+    def clean(self):
+        if not self.complete:
+            active_tasks = Task.objects.filter(
+                assigned_to=self.assigned_to,
+                complete=False
+            ).exclude(pk=self.pk).count()
+
+            if active_tasks >= MAX_ACTIVE_TASKS:
+                raise ValidationError(
+                    f"This employee already has {MAX_ACTIVE_TASKS} active tasks."
+                )
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
 
 class LeaveRequest(models.Model):
     STATUS_CHOICES = [

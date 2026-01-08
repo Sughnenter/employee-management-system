@@ -2,6 +2,9 @@ from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from .models import Employee, Task, LeaveRequest
+from django.utils import timezone
+from datetime import timedelta
+
 
 class EmployeeCreationForm(UserCreationForm):
     class Meta:
@@ -58,18 +61,36 @@ class TaskForm(ModelForm):
             })
         }        
 
+MAX_LEAVES_PER_MONTH = 2
 class LeaveRequestForm(ModelForm):
     class Meta:
         model = LeaveRequest
         fields = ['employee', 'start_date', 'end_date', 'reason', 'leave_type', 'status']
 
     def __init__(self, *args, **kwargs):
+        self.employee = kwargs.pop('employee', None)
         super().__init__(*args, **kwargs)
+    def clean(self):
+        cleaned_data = super().clean()
 
-        for field_name, field in self.fields.items():
-            field.widget.attrs.update({
-                "class": "w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 mb-3"
-            })
+        if not self.employee:
+            return cleaned_data
+
+        today = timezone.now().date()
+        month_start = today.replace(day=1)
+
+        monthly_leave_count = LeaveRequest.objects.filter(
+            employee=self.employee,
+            applied_on__month=timezone.now().month,
+            applied_on__year=timezone.now().year
+        ).count()
+
+        if monthly_leave_count >= MAX_LEAVES_PER_MONTH:
+            raise forms.ValidationError(
+                f"You can only request {MAX_LEAVES_PER_MONTH} leaves per month."
+            )
+
+        return cleaned_data
 
     widgets = {
             "leave_type": forms.Select(attrs={
