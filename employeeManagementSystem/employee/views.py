@@ -95,6 +95,7 @@ class DashboardView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         today = timezone.now().date()
         grace_period = today - timedelta(days=3)
+        expired_rejected_cutoff = timezone.now() - timedelta(days=3)
         ctx = super().get_context_data(**kwargs)
         ctx['leave_requests'] = LeaveRequest.objects.filter(
             employee=self.request.user
@@ -106,19 +107,26 @@ class DashboardView(LoginRequiredMixin, ListView):
             deadline__gte=grace_period
         )
         
-        ctx['active_leaves'] = LeaveRequest.objects.filter(
-            employee=self.request.user,
-            status='Approved',
-            end_date__gte=today
+        # ctx['active_leaves'] = LeaveRequest.objects.filter(
+        #     employee=self.request.user,
+        #     status='Approved',
+        #     end_date__gte=today
+        # )
+
+        # All visible leaves (exclude expired rejected ones)
+        ctx['leave_requests'] = LeaveRequest.objects.filter(
+            employee=self.request.user
+        ).exclude(
+            Q(status='Rejected') & Q(updated_at__lt=expired_rejected_cutoff)
         )
 
-        # Recently rejected (for alert)
+        # Recently rejected (for alert banner)
         ctx['recent_rejected_leaves'] = LeaveRequest.objects.filter(
             employee=self.request.user,
             status='Rejected',
-            updated_at__gte=timezone.now() - timedelta(days=3)
+            updated_at__gte=expired_rejected_cutoff
         )
-        
+
         return ctx
 
 
@@ -139,7 +147,7 @@ class CompleteTaskView(LoginRequiredMixin, View):
         task = get_object_or_404(Task, id=task_id)
 
         # Security check — only the employee assigned can complete the task
-        if task.assigned_to != request.user:
+        if not (request.user.is_staff or task.assigned_to == request.user):
             return redirect('dashboard')   # or raise PermissionDenied
 
         task.complete = True
