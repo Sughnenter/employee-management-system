@@ -94,6 +94,7 @@ class DashboardView(LoginRequiredMixin, ListView):
         
     def get_context_data(self, **kwargs):
         today = timezone.now().date()
+        grace_period = today - timedelta(days=3)
         ctx = super().get_context_data(**kwargs)
         ctx['leave_requests'] = LeaveRequest.objects.filter(
             employee=self.request.user
@@ -101,7 +102,8 @@ class DashboardView(LoginRequiredMixin, ListView):
         ctx['overdue_tasks'] = Task.objects.filter(
             assigned_to=self.request.user,
             complete=False,
-            deadline__lt=today
+            deadline__lt=today,
+            deadline__gte=grace_period
         )
         
         ctx['active_leaves'] = LeaveRequest.objects.filter(
@@ -145,7 +147,7 @@ class CompleteTaskView(LoginRequiredMixin, View):
 
         return redirect('dashboard')
 
-class TaskUpdate(LoginRequiredMixin, UpdateView):
+class TaskUpdate(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
     model = Task
     fields = ['title', 'description', 'deadline', 'complete']
     success_url = reverse_lazy('tasks')
@@ -154,7 +156,7 @@ class TaskUpdate(LoginRequiredMixin, UpdateView):
         form.instance.employee = self.request.user
         return super(TaskUpdate, self).form_valid(form)
 
-class TaskDelete(LoginRequiredMixin, DeleteView):
+class TaskDelete(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
     model = Task
     context_object_name = 'task'
     success_url = reverse_lazy('dashboard')
@@ -193,7 +195,7 @@ def update_leave_status(request, pk, action):
     leave_request.save()
     return redirect("leave_approve")    
 
-class EmployeeDetailView(DetailView):
+class EmployeeDetailView(AdminOnlyMixin, DetailView):
     model = Employee
     template_name = 'employee/employee_detail.html'
     context_object_name = 'employee'
@@ -236,7 +238,7 @@ class EmployeeListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
 
 def export_employees_csv(request):
     if not request.user.is_superuser:
-        return HttpResponseForbidden("You do not have permission to export employees.")
+        return redirect("dashboard")
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="employees.csv"'
     writer = csv.writer(response)
