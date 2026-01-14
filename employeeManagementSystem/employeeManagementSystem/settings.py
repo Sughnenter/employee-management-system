@@ -41,8 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'employee.apps.EmployeeConfig',
+    "tailwind",
+    "theme"
+
 ]
+
+TAILWIND_APP_NAME = "theme"
+
 AUTH_USER_MODEL = 'employee.Employee'
+
+NPM_BIN_PATH = "c:"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
