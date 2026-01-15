@@ -50,7 +50,8 @@ TAILWIND_APP_NAME = "theme"
 
 AUTH_USER_MODEL = 'employee.Employee'
 
-NPM_BIN_PATH = "c:"
+# settings.py (add near other settings)
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
