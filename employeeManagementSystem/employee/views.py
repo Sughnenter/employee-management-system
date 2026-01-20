@@ -80,7 +80,8 @@ class UpdateEmployeeView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
     
 
 class DashboardView(LoginRequiredMixin, ListView):
-    model = Task, LeaveRequest
+    # Dashboard primarily lists Tasks; leave requests are added to context
+    model = Task
     template_name = 'employee/dashboard.html'
     context_object_name = 'tasks'
 
@@ -192,7 +193,8 @@ class ApproveLeaveRequestView(LoginRequiredMixin, AdminOnlyMixin, ListView):
 def update_leave_status(request, pk, action):
     leave_request = get_object_or_404(LeaveRequest, pk=pk)
 
-    if not (request.user.is_staff or request.user.is_admin):
+    # Only staff/superusers should be able to approve/reject
+    if not (request.user.is_staff or request.user.is_superuser):
         return redirect("dashboard")
 
     if action == "approve":

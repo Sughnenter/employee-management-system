@@ -65,7 +65,9 @@ MAX_LEAVES_PER_MONTH = 2
 class LeaveRequestForm(ModelForm):
     class Meta:
         model = LeaveRequest
-        fields = ['employee', 'start_date', 'end_date', 'reason', 'leave_type', 'status']
+        # Do not expose `employee` or `status` in the form; employee is set in the view
+        # and status should default to 'Pending'.
+        fields = ['start_date', 'end_date', 'reason', 'leave_type']
 
     def __init__(self, *args, **kwargs):
         self.employee = kwargs.pop('employee', None)

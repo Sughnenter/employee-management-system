@@ -143,7 +143,9 @@ class LeaveRequest(models.Model):
     leave_type = models.CharField(max_length=20, choices=LEAVE_TYPE, default='other') #leave type field with choices
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending') #status field with choices
     applied_on = models.DateField(auto_now_add=True) #date field for applied on
-    updated_at = models.DateTimeField(auto_now_add=True)
+    # `updated_at` should reflect the last modification (e.g., when status is changed).
+    # Use auto_now so it updates on every save.
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-applied_on']
