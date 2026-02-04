@@ -21,7 +21,7 @@
         <li><strong class="text-gray-300">Phone:</strong> {{ employee.phone_number }}</li>
         <li><strong class="text-gray-300">Department:</strong> {{ employee.department }}</li>
         <li><strong class="text-gray-300">Position:</strong> {{ employee.position }}</li>
-        <li><strong class="text-gray-300">Joined:</strong> {{ employee.date_joined }}</li>
+        <li><strong class="text-gray-300">ID:</strong> {{ employee.employee_id }}</li>
       </ul>
     </div>
 
@@ -32,6 +32,15 @@
         <li><strong class="text-gray-300">Tasks Assigned:</strong> {{ tasks.count }}</li>
         <li><strong class="text-gray-300">Completed Tasks:</strong> {{ completed_tasks }}</li>
         <li><strong class="text-gray-300">Leave Requests:</strong> {{ leave_requests.count }}</li>
+      </ul>
+    </div>
+    <div class="bg-gray-900 p-6 rounded-2xl shadow border border-gray-700">
+      <h2 class="text-xl font-semibold text-white mb-4">Other Information</h2>
+      <ul class="text-gray-400 space-y-2">
+        <li><strong class="text-gray-300">Date Joined:</strong> {{ employee.date_joined }}</li>
+        <li><strong class="text-gray-300">Salary(NGN):</strong> {{ employee.salary }}</li>
+        <li><strong class="text-gray-300">Gender:</strong> {{ employee.gender }}</li>
+        <li><strong class="text-gray-300">Adress:</strong> {{ employee.address }}</li>
       </ul>
     </div>
 

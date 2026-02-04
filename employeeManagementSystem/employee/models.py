@@ -1,6 +1,7 @@
 from django.db import models, transaction
 from django.contrib.auth.models import AbstractUser
 from datetime import date
+from decimal import Decimal
 from django.core.exceptions import ValidationError
 
 # Create your models here.
@@ -48,6 +49,12 @@ class Employee(AbstractUser):
     address = models.CharField(max_length=200, blank=True)
     employee_id = models.CharField(max_length=20, unique=True, blank=True)
     department = models.CharField(max_length=100, blank=True, choices=DEPARTMENT_CHOICES)
+
+    # Salary stored as a decimal amount in Nigerian Naira. Default assigned to all
+    # employees and not exposed on public forms. Use Decimal for money precision.
+    salary = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('100000.00'))
+    # Currency code for clarity; keep non-editable since app uses NGN only
+    salary_currency = models.CharField(max_length=3, default='NGN', editable=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

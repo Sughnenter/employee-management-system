@@ -252,7 +252,7 @@ def export_employees_csv(request):
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = 'attachment; filename="employees.csv"'
     writer = csv.writer(response)
-    writer.writerow(["Full Name", "Email", "Gender", "Date of Birth", "Employment date", "Phone number", "Address", "ID" "Department", "Position"])
+    writer.writerow(["Full Name", "Email", "Gender", "Date of Birth", "Employment date", "Phone number", "Address", "ID", "Department", "Position", "Salary", "Currency"])
     for emp in Employee.objects.all():
         writer.writerow([
             emp.full_name,
@@ -265,6 +265,8 @@ def export_employees_csv(request):
             emp.employee_id,
             emp.department,
             emp.get_position_display(),  # Get human-readable choice label
+            f"{emp.salary:,.2f}",
+            emp.salary_currency,
         ])
 
     return response
@@ -283,7 +285,7 @@ class ExportEmployeesPDFView(LoginRequiredMixin, AdminOnlyMixin, View):
         p.setFont("Helvetica", 10)
 
         for emp in employees:
-            p.drawString(50, y, f"{emp.full_name} | {emp.email} | {emp.department}")
+            p.drawString(50, y, f"{emp.full_name} | {emp.email} | {emp.department} | {emp.salary:,.2f} {emp.salary_currency}")
             y -= 20
             if y < 50:
                 p.showPage()
