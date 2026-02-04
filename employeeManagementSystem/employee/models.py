@@ -81,7 +81,6 @@ class Attendance(models.Model):
         default='Present'
     )
     remarks = models.TextField(blank=True, null=True)  # for custom notes like "Medical leave" or "Arrived 1hr late"
-
     class Meta:
         unique_together = ('employee', 'date')
         ordering = ['-date']
