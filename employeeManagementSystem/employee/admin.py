@@ -7,6 +7,10 @@ class EmployeeAdmin(admin.ModelAdmin):
 	list_display = (
 		'full_name',
 		'email',
+    'gender',
+    'date_of_birth',
+    'employment_date',
+    'phone_number',
 		'department',
 		'position',
 		'employee_id',

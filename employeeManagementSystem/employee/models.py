@@ -1,10 +1,37 @@
 from django.db import models, transaction
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from datetime import date
 from decimal import Decimal
 from django.core.exceptions import ValidationError
 
 # Create your models here.
+class EmployeeManager(BaseUserManager):
+    """Custom manager for Employee model with email as the unique identifier."""
+    
+    def create_user(self, email, password=None, **extra_fields):
+        """Create and return a regular user with an email and password."""
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+    
+    def create_superuser(self, email, password=None, **extra_fields):
+        """Create and return a superuser with an email and password."""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(email, password, **extra_fields)
+
+
 class Employee(AbstractUser):
     GENDER_CHOICES=(
         ('male', 'MALE'),
@@ -58,6 +85,9 @@ class Employee(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+    
+    # Attach the custom manager so Django uses it for create_user/create_superuser
+    objects = EmployeeManager()
 
     def save(self, *args, **kwargs):
         # Only generate employee_id if it doesn’t exist
